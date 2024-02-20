@@ -40,7 +40,7 @@ dispatcher.add_handler(CommandHandler("start", start))
 dispatcher.add_handler(CommandHandler("captcha", captcha_handler))
 
 # Register ChatMemberHandler to handle new users joining the group
-dispatcher.add_handler(ChatMemberHandler(check_link_bio, filters=Filters.STATUS_UPDATE.new_chat_members))
+dispatcher.add_handler(ChatMemberHandler(check_link_bio, filters=Filters.status_update.new_chat_members))
 
 # Start the Bot
 updater.start_polling()
