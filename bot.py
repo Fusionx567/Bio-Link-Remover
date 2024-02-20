@@ -14,7 +14,7 @@ warned_users = {}
 
 # Function to check if a user's bio contains a link
 def has_link(user):
-    return "http" in user.bio.lower() or "www" in user.bio.lower()
+    return user is not None and hasattr(user, 'bio') and ("http" in user.bio.lower() or "www" in user.bio.lower())
 
 # Function to delete message and warn user
 async def delete_and_warn_user(message: Message):
