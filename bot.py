@@ -37,8 +37,8 @@ async def on_message_handler(client, message: Message):
                 await message.delete()
 
 # Event handler for the bot starting
-@app.on_start()
-async def on_start_handler():
+@app.on_startup()
+async def on_startup_handler():
     print("Bot has started!")
 
 # Start the bot
