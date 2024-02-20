@@ -21,7 +21,7 @@ async def has_link(user):
         return False
 
 # Event handler for the on_message event
-@app.on_message(filters.chat(group_chat_id) & filters.text)
+@app.on_message(filters.chat(group_chat_id) & filters.all)
 async def on_message_handler(client, message: Message):
     try:
         user = message.from_user
@@ -31,13 +31,15 @@ async def on_message_handler(client, message: Message):
     except Exception as e:
         print(f"Error processing message: {str(e)}")
 
-# Event handler for errors
-@app.on_error()
-async def on_error_handler(client, error):
+# Error handler function
+def error_handler(client, error):
     try:
         print(f"An error occurred: {str(error)}")
     except Exception as e:
         print(f"Error handling error: {str(e)}")
+
+# Register the error handler
+app.add_error_handler(error_handler)
 
 # Code to execute after creating the Pyrogram client
 print("Bot has started!")
