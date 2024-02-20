@@ -14,8 +14,16 @@ warned_users = {}
 
 # Function to check if a user's bio contains a link
 def has_link(user):
-    print(f"User: {user}")
-    return user is not None and hasattr(user, 'bio') and ("https" in user.bio.lower() or "www" in user.bio.lower())
+    # Check if the user object is not None and is a bot
+    if user is not None and user.is_bot:
+        # Fetch the complete ChatMember object
+        chat_member = app.get_chat_member(chat_id=-1001848459006, user_id=user.id)
+        
+        # Check if the chat_member has a user object and a bio attribute
+        if chat_member and hasattr(chat_member.user, 'bio'):
+            return "http" in chat_member.user.bio.lower() or "www" in chat_member.user.bio.lower()
+    
+    return False
 
 # Function to delete message and warn user
 async def delete_and_warn_user(message: Message):
