@@ -1,5 +1,4 @@
 from telegram.ext import Updater, MessageHandler, Filters
-from telegram import BotCommand
 import re
 
 # Define your bot token here
@@ -11,10 +10,8 @@ link_pattern = re.compile(r'https?://\S+')
 # Define a function to delete messages with links in user's bio
 def delete_messages_with_links(update, context):
     user = update.effective_user
-    if user and user.username:
-        user_info = context.bot.get_chat_member(update.effective_chat.id, user.id).user
-        if user_info.bio and link_pattern.search(user_info.bio):
-            context.bot.delete_message(chat_id=update.effective_chat.id, message_id=update.message.message_id)
+    if user and user.username and user.bio and link_pattern.search(user.bio):
+        context.bot.delete_message(chat_id=update.effective_chat.id, message_id=update.message.message_id)
 
 def main():
     updater = Updater(TOKEN, use_context=True)
