@@ -4,7 +4,7 @@ from pyrogram.types import Message, ChatMemberUpdated
 # Your Telegram API credentials
 api_id = "21007450"
 api_hash = "b86c382f42b509d911c7bca27855754f"
-bot_token = "6873076181:AAEDQa0jwEFLzqE8nJxuLt5tTW73rD4ZFAw"
+bot_token = "your_bot_token"
 
 # Your private channel chat ID
 private_channel_chat_id = -1001848459006  # Replace with your actual private channel chat ID
@@ -25,22 +25,21 @@ async def has_link(user):
 
     return False
 
-# Function to check and delete messages with links
-async def check_and_delete_links(client, message: Message):
-    # Check if the message is from a user and contains text
-    if message.from_user and message.text:
-        # Call the asynchronous has_link function with await
-        if await has_link(message.from_user):
-            # Delete the message if it has a link
-            await message.delete()
+# Event handler for the on_message event
+@app.on_message(filters.chat(private_channel_chat_id) & filters.new_chat_members)
+async def on_message_handler(client, message: Message):
+    # Check if the new chat member is a bot
+    for member in message.new_chat_members:
+        if member.is_bot:
+            # Call the asynchronous has_link function with await
+            if await has_link(member):
+                # Delete the message if the bot has a link
+                await message.delete()
 
-# Event handler for the on_chat_member event
-@app.on_chat_member(filters.chat(private_channel_chat_id) & filters.incoming & filters.chat_action("joined"))
-async def on_chat_member_handler(_, chat_member: ChatMemberUpdated):
-    print(f"Bot joined the chat: {chat_member}")
-
-    # Start the message handler
-    app.add_handler(check_and_delete_links)
+# Event handler for the bot starting
+@app.on_start()
+async def on_start_handler():
+    print("Bot has started!")
 
 # Start the bot
 app.run()
