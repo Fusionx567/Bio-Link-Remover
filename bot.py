@@ -1,39 +1,63 @@
-from pyrogram import Client, filters
-from pyrogram.types import Message
+from telegram import Update
+from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, CallbackContext
+import logging
 
-# Your Telegram API credentials
-api_id = "21007450"
-api_hash = "b86c382f42b509d911c7bca27855754f"
-bot_token = "6873076181:AAEDQa0jwEFLzqE8nJxuLt5tTW73rD4ZFAw"
-# Your group chat ID
-group_chat_id = -1001848459006  # Replace with your actual group chat ID
+# Enable logging
+logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO)
 
-# Create a Pyrogram Client
-app = Client("my_bot", api_id=api_id, api_hash=api_hash, bot_token=bot_token)
+logger = logging.getLogger(__name__)
 
-# Function to check if a user's bio contains a link
-async def has_link(user):
-    try:
-        # Check if the user is a bot and has a bio attribute
-        return user is not None and user.is_bot and hasattr(user, 'bio') and ("http" in user.bio.lower() or "www" in user.bio.lower())
-    except Exception as e:
-        print("Error checking link:", str(e))
-        return False
+# Define a function to handle the /start command
+def start(update: Update, context: CallbackContext) -> None:
+    update.message.reply_text('Hello! Send /groups <user-id> to get the list of groups a user is in.')
 
-# Event handler for the on_message event
-@app.on_message(filters.chat(group_chat_id) & filters.all)
-async def on_message_handler(client, message: Message):
-    try:
-        user = message.from_user
-        print(f"Received message from user: {user}")
-        if await has_link(user):
-            # Delete the message if the user has a link in their bio
-            await message.delete()
-    except Exception as e:
-        print("Error processing message:", str(e))
+# Define a function to handle the /groups command
+def groups(update: Update, context: CallbackContext) -> None:
+    # Extract the user_id from the command
+    user_id = None
+    if context.args:
+        user_id = context.args[0]
 
-# Code to execute after creating the Pyrogram client
-print("Bot has started!")
+    if not user_id:
+        update.message.reply_text('Please provide a user ID. Usage: /groups <user-id>')
+        return
 
-# Start the bot
-app.run()
+    user_groups = []
+
+    # Get the user's member info in each chat
+    for chat in context.bot.get_chat(user_id).get_member():
+        if chat.status == 'member':
+            user_groups.append(chat.link)
+
+    if user_groups:
+        groups_text = '\n'.join(user_groups)
+        update.message.reply_text(f'The user is in the following groups:\n{groups_text}')
+    else:
+        update.message.reply_text('The user is not a member of any groups.')
+
+# Define a function to handle errors
+def error(update: Update, context: CallbackContext) -> None:
+    logger.warning('Update "%s" caused error "%s"', update, context.error)
+
+def main() -> None:
+    # Create the Updater and pass it your bot's token
+    updater = Updater("6873076181:AAEDQa0jwEFLzqE8nJxuLt5tTW73rD4ZFAw")
+
+    # Get the dispatcher to register handlers
+    dispatcher = updater.dispatcher
+
+    # Register command handlers
+    dispatcher.add_handler(CommandHandler("start", start))
+    dispatcher.add_handler(CommandHandler("groups", groups, pass_args=True))
+
+    # Log all errors
+    dispatcher.add_error_handler(error)
+
+    # Start the Bot
+    updater.start_polling()
+
+    # Run the bot until you press Ctrl-C
+    updater.idle()
+
+if __name__ == '__main__':
+    main()
