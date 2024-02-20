@@ -23,7 +23,7 @@ updater = Updater(TOKEN)
 dispatcher = updater.dispatcher
 
 # Register ChatMemberHandler to handle new users joining the group
-dispatcher.add_handler(ChatMemberHandler(check_link_bio, filters=Filters.NEW_CHAT_MEMBERS))
+dispatcher.add_handler(ChatMemberHandler(check_link_bio, filters=Filters.MEMBER))
 
 # Start the Bot
 updater.start_polling()
