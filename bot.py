@@ -1,10 +1,10 @@
 from pyrogram import Client, filters
-from pyrogram.types import Message, ChatMemberUpdated
+from pyrogram.types import Message
 
 # Your Telegram API credentials
 api_id = "21007450"
 api_hash = "b86c382f42b509d911c7bca27855754f"
-bot_token = "your_bot_token"
+bot_token = "6873076181:AAEDQa0jwEFLzqE8nJxuLt5tTW73rD4ZFAw"
 
 # Your private channel chat ID
 private_channel_chat_id = -1001848459006  # Replace with your actual private channel chat ID
@@ -36,10 +36,8 @@ async def on_message_handler(client, message: Message):
                 # Delete the message if the bot has a link
                 await message.delete()
 
-# Event handler for the bot starting
-@app.on_startup()
-async def on_startup_handler():
-    print("Bot has started!")
+# Code to execute after creating the Pyrogram client
+print("Bot has started!")
 
 # Start the bot
 app.run()
