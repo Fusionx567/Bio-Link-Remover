@@ -1,33 +1,56 @@
-from telegram.ext import Updater, MessageHandler, Filters
-import re
+from pyrogram import Client, filters
+from pyrogram.types import Message
 
-# Replace 'your_bot_token_here' with your actual bot token
-TOKEN = '6873076181:AAEDQa0jwEFLzqE8nJxuLt5tTW73rD4ZFAw'
+# Your Telegram API credentials
+api_id = "21007450"
+api_hash = "b86c382f42b509d911c7bca27855754f"
+bot_token = "6873076181:AAEDQa0jwEFLzqE8nJxuLt5tTW73rD4ZFAw"
 
-# Define your link regex pattern
-link_pattern = re.compile(r'https?://\S+')
+# Create a Pyrogram Client
+app = Client("my_bot", api_id=api_id, api_hash=api_hash, bot_token=bot_token)
 
-# Define a function to delete messages with links in user's bio
-def delete_messages_with_links(update, context):
-    user = update.effective_user
-    if user and user.username and user.description and link_pattern.search(user.description):
-        context.bot.delete_message(chat_id=update.effective_chat.id, message_id=update.message.message_id)
+# Dictionary to keep track of users who have been warned
+warned_users = {}
 
-def main():
-    # Create an Updater and pass it your bot's token
-    updater = Updater(TOKEN, use_context=True)
+# Function to check if a user's bio contains a link
+def has_link(user):
+    return "http" in user.bio.lower() or "www" in user.bio.lower()
 
-    # Get the dispatcher to register handlers
-    dp = updater.dispatcher
+# Function to delete message and warn user
+async def delete_and_warn_user(message: Message):
+    user_id = message.from_user.id
 
-    # Add message handler to filter messages with links in user's bio
-    dp.add_handler(MessageHandler(Filters.text & (~Filters.command), delete_messages_with_links))
+    # Check if the user has already been warned
+    if user_id in warned_users:
+        # User has been warned before, delete the message
+        await message.delete()
+    else:
+        # User has not been warned, send a warning message
+        await message.reply_text("Please remove the link from your bio. Links are not allowed.")
+        
+        # Add the user to the warned_users dictionary
+        warned_users[user_id] = True
 
-    # Start the Bot
-    updater.start_polling()
+# Command handler for /start
+@app.on_message(filters.command("start"))
+async def start_command(client, message: Message):
+    await message.reply_text("Bot is live. Use /check to see if your bio contains a link.")
 
-    # Run the bot until you send a signal to stop it
-    updater.idle()
+# Command handler for /check
+@app.on_message(filters.command("check"))
+async def check_command(client, message: Message):
+    user_id = message.from_user.id
 
-if __name__ == '__main__':
-    main()
+    if has_link(message.from_user):
+        await message.reply_text("Your bio contains a link. Please remove it.")
+    else:
+        await message.reply_text("Your bio does not contain a link. You're good!")
+
+# Message handler to check and delete messages with links
+@app.on_message(filters.group & filters.text)
+async def check_and_delete_links(client, message: Message):
+    if has_link(message.from_user):
+        await delete_and_warn_user(message)
+
+# Start the bot
+app.run()
