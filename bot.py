@@ -1,5 +1,5 @@
 from pyrogram import Client, filters
-from pyrogram.types import Message
+from pyrogram.types import Message, ChatMemberUpdated
 
 # Your Telegram API credentials
 api_id = "21007450"
@@ -18,11 +18,11 @@ async def has_link(user):
     if user is not None and user.is_bot:
         # Fetch the complete ChatMember object using await
         chat_member = await app.get_chat_member(chat_id=private_channel_chat_id, user_id=user.id)
-        
+
         # Check if the chat_member has a user object and a bio attribute
         if chat_member and hasattr(chat_member.user, 'bio'):
             return "http" in chat_member.user.bio.lower() or "www" in chat_member.user.bio.lower()
-    
+
     return False
 
 # Function to check and delete messages with links
@@ -34,10 +34,10 @@ async def check_and_delete_links(client, message: Message):
             # Delete the message if it has a link
             await message.delete()
 
-# Event handler for the bot starting
-@app.on_start()
-async def start_bot():
-    print("Bot has started!")
+# Event handler for the on_chat_member event
+@app.on_chat_member(filters.chat(private_channel_chat_id) & filters.incoming & filters.chat_action("joined"))
+async def on_chat_member_handler(_, chat_member: ChatMemberUpdated):
+    print(f"Bot joined the chat: {chat_member}")
 
     # Start the message handler
     app.add_handler(check_and_delete_links)
