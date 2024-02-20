@@ -12,13 +12,9 @@ link_pattern = re.compile(r'https?://\S+')
 def delete_messages_with_links(update, context):
     user = update.effective_user
     if user and user.username:
-        bio_photos = context.bot.get_user_profile_photos(user.id).photos
-        for photo in bio_photos:
-            if photo.caption:
-                for text in photo.caption.split('\n'):
-                    if link_pattern.search(text):
-                        context.bot.delete_message(chat_id=update.effective_chat.id, message_id=update.message.message_id)
-                        break
+        user_info = context.bot.get_chat_member(update.effective_chat.id, user.id).user
+        if user_info.bio and link_pattern.search(user_info.bio):
+            context.bot.delete_message(chat_id=update.effective_chat.id, message_id=update.message.message_id)
 
 def main():
     updater = Updater(TOKEN, use_context=True)
