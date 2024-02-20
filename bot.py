@@ -13,11 +13,11 @@ app = Client("my_bot", api_id=api_id, api_hash=api_hash, bot_token=bot_token)
 warned_users = {}
 
 # Function to check if a user's bio contains a link
-def has_link(user):
+async def has_link(user):
     # Check if the user object is not None and is a bot
     if user is not None and user.is_bot:
-        # Fetch the complete ChatMember object
-        chat_member = app.get_chat_member(chat_id=-1001848459006, user_id=user.id)
+        # Fetch the complete ChatMember object using await
+        chat_member = await app.get_chat_member(chat_id=-1001848459006, user_id=user.id)
         
         # Check if the chat_member has a user object and a bio attribute
         if chat_member and hasattr(chat_member.user, 'bio'):
