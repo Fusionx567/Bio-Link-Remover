@@ -1,36 +1,32 @@
-from telegram import Update, ParseMode
-from telegram.ext import Updater, MessageHandler, Filters, CallbackContext
+from telegram.ext import Updater, MessageHandler, Filters
+from telegram import BotCommand
+import re
 
-# Replace 'YOUR_BOT_TOKEN' with the actual token of your bot
+# Define your bot token here
 TOKEN = '6873076181:AAEDQa0jwEFLzqE8nJxuLt5tTW73rD4ZFAw'
 
-def delete_and_warn(update: Update, context: CallbackContext) -> None:
-    user = update.message.from_user
-    user_id = user.id
+# Define your link regex pattern
+link_pattern = re.compile(r'https?://\S+')
 
-    # Retrieve user profile photos
-    profile_photos = context.bot.get_user_profile_photos(user_id)
-
-    # Check if there are any profile photos (indicating a link in bio)
-    if profile_photos.photos:
-        # User has a link in bio, delete the message
-        context.bot.delete_message(update.message.chat_id, update.message.message_id)
-
-        # Send a warning message to the user
-        warning_message = "Please remove the link from your bio to avoid message deletion."
-        context.bot.send_message(user_id, warning_message, parse_mode=ParseMode.MARKDOWN)
+# Define a function to delete messages with links in user's bio
+def delete_messages_with_links(update, context):
+    user = update.effective_user
+    if user and user.username:
+        bio = context.bot.get_user_profile_photos(user.id).photos
+        if bio:
+            for photo in bio:
+                for text in photo.caption.split('\n'):
+                    if link_pattern.search(text):
+                        context.bot.delete_message(chat_id=update.effective_chat.id, message_id=update.message.message_id)
+                        break
 
 def main():
-    # Create an updater and pass it the bot's token
-    updater = Updater(TOKEN)
+    updater = Updater(TOKEN, use_context=True)
+    dp = updater.dispatcher
 
-    # Get the dispatcher to register handlers
-    dispatcher = updater.dispatcher
+    # Add message handler to filter messages with links in user's bio
+    dp.add_handler(MessageHandler(Filters.text & (~Filters.command), delete_messages_with_links))
 
-    # Register MessageHandler to check for messages and apply the delete_and_warn function
-    dispatcher.add_handler(MessageHandler(Filters.text & ~Filters.command, delete_and_warn))
-
-    # Start the Bot
     updater.start_polling()
     updater.idle()
 
