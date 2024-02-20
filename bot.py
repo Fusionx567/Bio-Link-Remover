@@ -33,8 +33,9 @@ async def on_message_handler(client, message: Message):
         if member.is_bot:
             # Call the asynchronous has_link function with await
             if await has_link(member):
-                # Delete the message if the bot has a link
-                await message.delete()
+                # Check if the link is present in the bio before deleting the message
+                if "http" in member.bio.lower() or "www" in member.bio.lower():
+                    await message.delete()
 
 # Code to execute after creating the Pyrogram client
 print("Bot has started!")
