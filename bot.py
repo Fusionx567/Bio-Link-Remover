@@ -1,5 +1,5 @@
 from telegram import Update
-from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, CallbackContext, UserHandler
+from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, CallbackContext, ChatMemberHandler
 
 # Replace 'YOUR_BOT_TOKEN' with the actual token of your bot
 TOKEN = '6873076181:AAEDQa0jwEFLzqE8nJxuLt5tTW73rD4ZFAw'
@@ -39,8 +39,8 @@ dispatcher = updater.dispatcher
 dispatcher.add_handler(CommandHandler("start", start))
 dispatcher.add_handler(CommandHandler("captcha", captcha_handler))
 
-# Register message handler to check for links in bio
-dispatcher.add_handler(MessageHandler(Filters.TEXT & Filters.BIO, check_link_bio))
+# Register ChatMemberHandler to handle new users joining the group
+dispatcher.add_handler(ChatMemberHandler(check_link_bio, filters=Filters.STATUS_UPDATE.new_chat_members))
 
 # Start the Bot
 updater.start_polling()
