@@ -23,7 +23,7 @@ def main():
     dispatcher = updater.dispatcher
 
     # Register MessageHandler to check for messages and apply the delete_and_warn function
-    dispatcher.add_handler(MessageHandler(Filters.TEXT & ~Filters.COMMAND, delete_and_warn))
+    dispatcher.add_handler(MessageHandler(Filters.text & ~Filters.command, delete_and_warn))
 
     # Start the Bot
     updater.start_polling()
