@@ -2,7 +2,7 @@ from telegram import Update
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, CallbackContext, UserHandler
 
 # Replace 'YOUR_BOT_TOKEN' with the actual token of your bot
-TOKEN = 'YOUR_BOT_TOKEN'
+TOKEN = '6873076181:AAEDQa0jwEFLzqE8nJxuLt5tTW73rD4ZFAw'
 
 # Dictionary to store user verification status
 user_verification_status = {}
