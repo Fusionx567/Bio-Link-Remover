@@ -17,7 +17,7 @@ async def has_link(user):
         # Check if the user is a bot and has a bio attribute
         return user is not None and user.is_bot and hasattr(user, 'bio') and ("http" in user.bio.lower() or "www" in user.bio.lower())
     except Exception as e:
-        print(f"Error checking link: {str(e)}")
+        print("Error checking link:", str(e))
         return False
 
 # Event handler for the on_message event
@@ -30,5 +30,10 @@ async def on_message_handler(client, message: Message):
             # Delete the message if the user has a link in their bio
             await message.delete()
     except Exception as e:
-        print(f"Error 
+        print("Error processing message:", str(e))
 
+# Code to execute after creating the Pyrogram client
+print("Bot has started!")
+
+# Start the bot
+app.run()
