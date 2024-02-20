@@ -25,17 +25,10 @@ async def has_link(user):
 async def on_message_handler(client, message: Message):
     try:
         user = message.from_user
+        print(f"Received message from user: {user}")
         if await has_link(user):
             # Delete the message if the user has a link in their bio
             await message.delete()
     except Exception as e:
-        print(f"Error processing message: {str(e)}")
+        print(f"Error 
 
-# Code to execute after creating the Pyrogram client
-print("Bot has started!")
-
-# Start the bot
-app.run()
-
-# Start the bot
-app.run()
