@@ -1,7 +1,7 @@
 import telebot
 
 # Replace 'YOUR_BOT_TOKEN' with your actual bot token
-bot = telebot.TeleBot('YOUR_BOT_TOKEN')
+bot = telebot.TeleBot('6442848831:AAGqdJG-s_9mL9kG5aCAsuwtvgnpZzMxuPU')
 
 @bot.message_handler(content_types=['text'])
 def check_bio(message):
