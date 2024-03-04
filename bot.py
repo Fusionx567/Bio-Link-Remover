@@ -5,15 +5,20 @@ bot = telebot.TeleBot('6442848831:AAGqdJG-s_9mL9kG5aCAsuwtvgnpZzMxuPU')
 
 @bot.message_handler(content_types=['text'])
 def check_bio(message):
-    # Check if the user's bio contains a link
-    if 'http' in message.from_user.bio:
-        # Send a warning message to the user
-        bot.send_message(message.chat.id, "Please remove the link from your bio.")
-        # Delete the message
-        bot.delete_message(chat_id=message.chat.id, message_id=message.message_id)
+    # Get user's profile photos
+    photos = bot.get_user_profile_photos(message.from_user.id)
+    # Check if user has any profile photos
+    if photos.photos:
+        # Extract bio from the first photo
+        bio = photos.photos[0][0].file_id
+        # Check if the bio contains a link
+        if 'http' in bio:
+            # Send a warning message to the user
+            bot.send_message(message.chat.id, "Please remove the link from your bio.")
+            # Delete the message
+            bot.delete_message(chat_id=message.chat.id, message_id=message.message_id)
     else:
-        # If no link is found, do nothing
-        pass
+        bot.send_message(message.chat.id, "You don't have a profile photo set, I can't check your bio.")
 
 @bot.message_handler(commands=['start'])
 def start(message):
